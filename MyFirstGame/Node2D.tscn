@@ -1,0 +1,28 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://VisualAssets/tileset/tileMap.tres" type="TileSet" id=1]
+[ext_resource path="res://VisualAssets/pAdventure/Background/Blue.png" type="Texture" id=2]
+[ext_resource path="res://Characters/Player.tscn" type="PackedScene" id=3]
+[ext_resource path="res://Scripts/Player.gd" type="Script" id=4]
+
+[node name="Level1" type="Node2D"]
+
+[node name="Blue" type="Sprite" parent="."]
+position = Vector2( 500, -500 )
+texture = ExtResource( 2 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 1000, 1000 )
+
+[node name="TileMap" type="TileMap" parent="."]
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 16, 16 )
+format = 1
+tile_data = PoolIntArray( -1966108, 13, 0 )
+
+[node name="Player" parent="." instance=ExtResource( 3 )]
+position = Vector2( 46, -58 )
+script = ExtResource( 4 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2( 160, -90 )
+current = true
