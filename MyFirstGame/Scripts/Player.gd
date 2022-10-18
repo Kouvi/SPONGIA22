@@ -2,14 +2,17 @@ extends KinematicBody2D
 
 export(float) var move_speed = 100
 export(float) var jump_impulse = 200
-
-enum STATE { IDLE, RUN, JUMP, FALL}
+export(int) var max_jumps = 2
+enum STATE { IDLE, RUN, JUMP, FALL, DOUBLE_JUMP}
 
 onready var animated_sprite = $AnimatedSprite
 onready var animation_tree = $AnimationTree
 
+signal changed_state(new_state_string, new_state)
+
 var velocity : Vector2
 
+var doubleJumps = 0
 var jumpS = 0
 var current_state = STATE.IDLE setget set_current_state
 
@@ -21,24 +24,30 @@ func _physics_process(delta):
 		min(velocity.y + GameSettings.gravity, GameSettings.terminal_velocity)
 	)
 	
+	#Character gains velocity and move
 	velocity = move_and_slide(velocity, Vector2.UP)
-	
+	#Character calls this function to pick a new state
 	pick_next_state()
-	
+	#Character calls this function to update its animation
 	set_anim_parameters()
 
+#Function updates animationtree parameter(flipH) 
 func adjust_flip_direction(input: Vector2):
 	if(sign(input.x) == 1):
 		animated_sprite.flip_h = false
 	elif(sign(input.x) == -1):
 		animated_sprite.flip_h = true
-	
+
+#Function which updates Animation Tree which then updates AnimatedSprite
 func set_anim_parameters():
 	animation_tree.set("parameters/x_move/blend_position", sign(velocity.x))
+	animation_tree.set("parameters/y_sign/blend_amount", sign(velocity.y))
 
+#Fuction which checks characters position and if the character is on floor allows it to jump and also updates States of the character
 func pick_next_state():
 	if(is_on_floor()):
 		jumpS = 0
+		doubleJumps = 0
 		if(Input.is_action_just_pressed("up")):
 			self.current_state = STATE.JUMP
 		elif(abs(velocity.x)>0):
@@ -46,10 +55,10 @@ func pick_next_state():
 		else:
 			self.current_state = STATE.IDLE
 	else:
-		#TODO Double Jump
-		pass
+		if(Input.is_action_just_pressed(("up"))&& jumpS < max_jumps&& doubleJumps ==0):
+			self.current_state = STATE.DOUBLE_JUMP
 
-
+#This function registers input from the player and returns it as Vector2
 func get_player_input():
 	var input : Vector2
 	
@@ -66,6 +75,9 @@ func set_current_state(new_state):
 	match(new_state):
 		STATE.JUMP:
 			jump()
-	
+		STATE.DOUBLE_JUMP:
+			jump()
+			animation_tree.set("parameters/double_jump/active", true)
+			doubleJumps +=1
 	current_state = new_state
-#GETTERS
+	emit_signal("changed_state", STATE.keys()[new_state], new_state)

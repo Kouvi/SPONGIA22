@@ -1,6 +1,8 @@
-[gd_scene load_steps=14 format=2]
+[gd_scene load_steps=21 format=2]
 
 [ext_resource path="res://Characters/Player.tres" type="SpriteFrames" id=1]
+[ext_resource path="res://Scripts/Player.gd" type="Script" id=2]
+[ext_resource path="res://Characters/LabelReceiver.gd" type="Script" id=3]
 
 [sub_resource type="CapsuleShape2D" id=1]
 radius = 9.0
@@ -8,8 +10,7 @@ height = 6.0
 
 [sub_resource type="Animation" id=3]
 resource_name = "double_jump"
-length = 0.05
-loop = true
+length = 0.3
 tracks/0/type = "value"
 tracks/0/path = NodePath("AnimatedSprite:animation")
 tracks/0/interp = 1
@@ -21,6 +22,18 @@ tracks/0/keys = {
 "transitions": PoolRealArray( 1 ),
 "update": 1,
 "values": [ "double_jump" ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("AnimationTree:parameters/double_jump/active")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0.3 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ false ]
 }
 
 [sub_resource type="Animation" id=4]
@@ -108,6 +121,19 @@ tracks/0/keys = {
 "values": [ "run" ]
 }
 
+[sub_resource type="AnimationNodeAnimation" id=17]
+animation = "double_jump"
+
+[sub_resource type="AnimationNodeOneShot" id=16]
+fadein_time = 0.0
+fadeout_time = 0.0
+
+[sub_resource type="AnimationNodeAnimation" id=13]
+animation = "fall"
+
+[sub_resource type="AnimationNodeAnimation" id=14]
+animation = "jump"
+
 [sub_resource type="AnimationNodeAnimation" id=8]
 animation = "idle"
 
@@ -125,19 +151,33 @@ blend_point_1/pos = 1.0
 blend_point_2/node = SubResource( 10 )
 blend_point_2/pos = -1.0
 
+[sub_resource type="AnimationNodeBlend3" id=15]
+
 [sub_resource type="AnimationNodeBlendTree" id=12]
-graph_offset = Vector2( -258.117, 72.6432 )
+graph_offset = Vector2( -342.012, -52.7683 )
+nodes/double_jump/node = SubResource( 16 )
+nodes/double_jump/position = Vector2( 466.667, -26.6667 )
+"nodes/double_jump 2/node" = SubResource( 17 )
+"nodes/double_jump 2/position" = Vector2( 306.667, 160 )
+nodes/fall/node = SubResource( 13 )
+nodes/fall/position = Vector2( 13.3333, 213.333 )
+nodes/jump/node = SubResource( 14 )
+nodes/jump/position = Vector2( -26.6667, -93.3333 )
+nodes/output/position = Vector2( 733.333, 93.3333 )
 nodes/x_move/node = SubResource( 11 )
-nodes/x_move/position = Vector2( 26.6667, 120 )
-node_connections = [ "output", 0, "x_move" ]
+nodes/x_move/position = Vector2( -106.667, 66.6667 )
+nodes/y_sign/node = SubResource( 15 )
+nodes/y_sign/position = Vector2( 186.667, -13.3333 )
+node_connections = [ "double_jump", 0, "y_sign", "double_jump", 1, "double_jump 2", "y_sign", 0, "jump", "y_sign", 1, "x_move", "y_sign", 2, "fall", "output", 0, "double_jump" ]
 
 [node name="Player" type="KinematicBody2D"]
+script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 position = Vector2( -1, 0 )
 frames = ExtResource( 1 )
 animation = "idle"
-frame = 9
+frame = 2
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -156,4 +196,18 @@ anims/run = SubResource( 7 )
 tree_root = SubResource( 12 )
 anim_player = NodePath("../AnimationPlayer")
 active = true
+parameters/double_jump/active = false
 parameters/x_move/blend_position = 0.0
+parameters/y_sign/blend_amount = 0.0
+
+[node name="Label" type="Label" parent="."]
+margin_left = -77.0
+margin_top = -32.0
+margin_right = 77.0
+margin_bottom = -18.0
+text = "None"
+align = 1
+clip_text = true
+script = ExtResource( 3 )
+
+[connection signal="changed_state" from="." to="Label" method="_on_Player_changed_state"]
