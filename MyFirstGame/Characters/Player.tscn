@@ -1,8 +1,9 @@
-[gd_scene load_steps=21 format=2]
+[gd_scene load_steps=23 format=2]
 
 [ext_resource path="res://Characters/Player.tres" type="SpriteFrames" id=1]
 [ext_resource path="res://Scripts/Player.gd" type="Script" id=2]
 [ext_resource path="res://Characters/LabelReceiver.gd" type="Script" id=3]
+[ext_resource path="res://dynamicFont.tres" type="DynamicFont" id=4]
 
 [sub_resource type="CapsuleShape2D" id=1]
 radius = 9.0
@@ -154,7 +155,7 @@ blend_point_2/pos = -1.0
 [sub_resource type="AnimationNodeBlend3" id=15]
 
 [sub_resource type="AnimationNodeBlendTree" id=12]
-graph_offset = Vector2( -342.012, -52.7683 )
+graph_offset = Vector2( -601.123, -81.3595 )
 nodes/double_jump/node = SubResource( 16 )
 nodes/double_jump/position = Vector2( 466.667, -26.6667 )
 "nodes/double_jump 2/node" = SubResource( 17 )
@@ -168,16 +169,20 @@ nodes/x_move/node = SubResource( 11 )
 nodes/x_move/position = Vector2( -106.667, 66.6667 )
 nodes/y_sign/node = SubResource( 15 )
 nodes/y_sign/position = Vector2( 186.667, -13.3333 )
-node_connections = [ "double_jump", 0, "y_sign", "double_jump", 1, "double_jump 2", "y_sign", 0, "jump", "y_sign", 1, "x_move", "y_sign", 2, "fall", "output", 0, "double_jump" ]
+node_connections = [ "output", 0, "double_jump", "double_jump", 0, "y_sign", "double_jump", 1, "double_jump 2", "y_sign", 0, "jump", "y_sign", 1, "x_move", "y_sign", 2, "fall" ]
+
+[sub_resource type="RectangleShape2D" id=18]
+extents = Vector2( 5.5, 2 )
 
 [node name="Player" type="KinematicBody2D"]
+collision_layer = 8
 script = ExtResource( 2 )
 
 [node name="AnimatedSprite" type="AnimatedSprite" parent="."]
 position = Vector2( -1, 0 )
 frames = ExtResource( 1 )
 animation = "idle"
-frame = 2
+frame = 5
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -205,9 +210,20 @@ margin_left = -77.0
 margin_top = -32.0
 margin_right = 77.0
 margin_bottom = -18.0
+custom_fonts/font = ExtResource( 4 )
 text = "None"
 align = 1
 clip_text = true
 script = ExtResource( 3 )
 
+[node name="JumpAttack" type="Area2D" parent="."]
+position = Vector2( -1, 0 )
+collision_layer = 0
+collision_mask = 2048
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="JumpAttack"]
+position = Vector2( 0.5, 14 )
+shape = SubResource( 18 )
+
 [connection signal="changed_state" from="." to="Label" method="_on_Player_changed_state"]
+[connection signal="area_shape_entered" from="JumpAttack" to="." method="_on_JumpAttack_area_shape_entered"]

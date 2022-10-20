@@ -1,16 +1,22 @@
-extends KinematicBody2D
+extends Enemy
+
+enum STATE{WALK, RUN}
 
 export(Array, NodePath) var waypoints
 export(int) var start_point = 0 
-export(int) var move_speed = 50
-export(int) var run_speed = 200
+export(int) var walk_speed = 50
+export(int) var run_speed = 100
 export(int) var waypoint_arrive_distance = 10
 
 var waypoint_position
 var waypoint_index setget set_waypoint_index
-
+var is_detected = 0
 var velocity = Vector2.ZERO
+var current_state = STATE.WALK
+
 onready var animated_sprite = $AnimatedSprite
+onready var animation_tree = $AnimationTree
+
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	self.waypoint_index = start_point
@@ -22,6 +28,13 @@ func _physics_process(delta):
 	if(distance_x >= waypoint_arrive_distance):
 		var direction_x_sign = sign(direction.x)
 		
+		var move_speed
+		
+		match(current_state):
+			STATE.WALK:
+				move_speed = walk_speed
+			STATE.RUN:
+				move_speed = run_speed
 		velocity = Vector2(
 		move_speed * sign(direction.x),
 		min(velocity.y + GameSettings.gravity, GameSettings.terminal_velocity)
@@ -32,7 +45,9 @@ func _physics_process(delta):
 		else:
 			animated_sprite.flip_h = false
 		
+		set_anim_parameters(is_detected)
 		velocity = move_and_slide(velocity, Vector2.UP)
+		
 	else:
 		#switch waypoints
 		var num_waypoints = waypoints.size()
@@ -43,8 +58,22 @@ func _physics_process(delta):
 			self.waypoint_index= 0 
 	
 	
+func set_anim_parameters(detected):
+	animation_tree.set("parameters/player_detect/blend_position", detected)
+
+
 
 #SETTERS
 func set_waypoint_index(value):
 	waypoint_index= value 
 	waypoint_position = get_node(waypoints[waypoint_index]).position 
+
+
+func _on_DetectionZone_body_shape_entered(body_rid, body, body_shape_index, local_shape_index):
+	is_detected = 1
+	current_state = STATE.RUN
+	
+
+func _on_DetectionZone_body_shape_exited(body_rid, body, body_shape_index, local_shape_index):
+	is_detected = 0
+	current_state = STATE.WALK
