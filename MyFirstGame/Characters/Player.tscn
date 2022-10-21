@@ -169,7 +169,7 @@ nodes/x_move/node = SubResource( 11 )
 nodes/x_move/position = Vector2( -106.667, 66.6667 )
 nodes/y_sign/node = SubResource( 15 )
 nodes/y_sign/position = Vector2( 186.667, -13.3333 )
-node_connections = [ "output", 0, "double_jump", "double_jump", 0, "y_sign", "double_jump", 1, "double_jump 2", "y_sign", 0, "jump", "y_sign", 1, "x_move", "y_sign", 2, "fall" ]
+node_connections = [ "y_sign", 0, "jump", "y_sign", 1, "x_move", "y_sign", 2, "fall", "double_jump", 0, "y_sign", "double_jump", 1, "double_jump 2", "output", 0, "double_jump" ]
 
 [sub_resource type="RectangleShape2D" id=18]
 extents = Vector2( 5.5, 2 )
@@ -182,7 +182,7 @@ script = ExtResource( 2 )
 position = Vector2( -1, 0 )
 frames = ExtResource( 1 )
 animation = "idle"
-frame = 5
+frame = 2
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
@@ -217,12 +217,11 @@ clip_text = true
 script = ExtResource( 3 )
 
 [node name="JumpAttack" type="Area2D" parent="."]
-position = Vector2( -1, 0 )
+position = Vector2( 0, 13 )
 collision_layer = 0
 collision_mask = 2048
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="JumpAttack"]
-position = Vector2( 0.5, 14 )
 shape = SubResource( 18 )
 
 [connection signal="changed_state" from="." to="Label" method="_on_Player_changed_state"]

@@ -44,7 +44,6 @@ func _physics_process(delta):
 			
 	#Character gains velocity and move
 	velocity = move_and_slide(velocity, Vector2.UP)
-	print(velocity.y)
 	#Character calls this function to pick a new state
 	pick_next_state()
 	#Character calls this function to update its animation
@@ -112,9 +111,11 @@ func jump():
 func _on_JumpAttack_area_shape_entered(area_rid, area, area_shape_index, local_shape_index):
 	var enemy = area.owner
 	
-	if(enemy is Enemy):
+	if(enemy is Enemy&&enemy.can_be_hit):
 		if(jump_attack.global_position.y < area.global_position.y):
-			#jump_attack
+			print("jump HB" + str(jump_attack.global_position))
+			print("pos of enemy" + str(area.global_position))
+			enemy.get_hit(1)
 			velocity.y = 0
 			velocity.y -= enemy_jump_impulse
 

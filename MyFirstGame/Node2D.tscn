@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=2]
+[gd_scene load_steps=6 format=2]
 
 [ext_resource path="res://VisualAssets/tileset/tileMap.tres" type="TileSet" id=1]
 [ext_resource path="res://VisualAssets/pAdventure/Background/Blue.png" type="Texture" id=2]
 [ext_resource path="res://Characters/Player.tscn" type="PackedScene" id=3]
 [ext_resource path="res://Characters/Enemies/Pig.tscn" type="PackedScene" id=4]
+[ext_resource path="res://dynamicFont.tres" type="DynamicFont" id=5]
 
 [node name="Level1" type="Node2D"]
 
@@ -44,3 +45,10 @@ position = Vector2( 361, -105 )
 position = Vector2( 542, -105 )
 
 [node name="Waipoint3" type="Position2D" parent="Waypoints"]
+
+[node name="Label" type="Label" parent="."]
+margin_left = 107.0
+margin_top = -181.0
+margin_right = 147.0
+margin_bottom = -167.0
+custom_fonts/font = ExtResource( 5 )
